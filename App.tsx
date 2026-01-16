@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Layout } from './components/Layout';
 import { CourtCard } from './components/CourtCard';
@@ -32,17 +31,15 @@ const App: React.FC = () => {
         .select('*');
 
       if (error) {
-        // Si Supabase renvoie une erreur, on extrait le message textuel
-        console.error("Erreur Supabase détaillée:", error);
-        throw new Error(error.message || "Erreur de base de données inconnue");
+        throw error; // Sera rattrapé par le catch
       }
       
       setBookings(data || []);
       setErrorMsg(null);
     } catch (err: any) {
-      // On s'assure que errorMsg est TOUJOURS une chaîne de caractères
-      const message = err instanceof Error ? err.message : JSON.stringify(err);
-      console.error("Erreur attrapée:", message);
+      console.error("Erreur détectée:", err);
+      // On s'assure que le message d'erreur est lisible même si c'est un objet
+      const message = err.message || (typeof err === 'object' ? JSON.stringify(err) : String(err));
       setErrorMsg(message);
     } finally {
       setLoading(false);
@@ -68,7 +65,7 @@ const App: React.FC = () => {
     try {
       const { error } = await supabase.from('bookings').insert([booking]);
       if (error) {
-        alert(`Erreur Supabase : ${error.message}`);
+        alert(`Erreur : ${error.message}`);
         return;
       }
       setView('my-bookings');
@@ -98,26 +95,26 @@ const App: React.FC = () => {
       {loading ? (
         <div className="flex flex-col items-center justify-center h-64 gap-4">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500"></div>
-          <p className="text-gray-500 animate-pulse">Connexion au club...</p>
+          <p className="text-gray-500 animate-pulse font-bold uppercase tracking-widest text-xs">Synchronisation Club...</p>
         </div>
       ) : errorMsg ? (
         <div className="bg-red-50 border border-red-100 p-8 rounded-3xl text-center max-w-xl mx-auto animate-fadeIn">
-          <div className="text-4xl mb-4">⚠️</div>
-          <h2 className="text-xl font-bold text-red-800 mb-2">Problème de connexion détecté</h2>
-          <p className="text-red-600 mb-6 font-mono text-sm bg-white p-4 rounded-xl border border-red-100 break-all">
+          <div className="text-4xl mb-4">🚫</div>
+          <h2 className="text-xl font-bold text-red-800 mb-2">Erreur de Clé API</h2>
+          <div className="text-red-600 mb-6 font-mono text-sm bg-white p-6 rounded-2xl border border-red-100 shadow-inner overflow-x-auto">
             {errorMsg}
-          </p>
-          <div className="text-left bg-white p-4 rounded-xl text-xs text-gray-600 mb-6 border border-gray-100">
-            <p className="font-bold mb-2 text-gray-800">Comment régler ça :</p>
-            <ul className="list-disc ml-4 space-y-1">
-              <li>Si vous voyez <b>"relation 'bookings' does not exist"</b> : créez la table dans Supabase via SQL Editor.</li>
-              <li>Si vous voyez <b>"JWSError"</b> : votre clé API est mal copiée ou expirée.</li>
-              <li>Si vous voyez <b>"Policy violations"</b> : activez l'accès public (RLS) dans Supabase.</li>
+          </div>
+          <div className="text-left bg-white p-5 rounded-2xl text-xs text-gray-600 mb-6 border border-gray-100 leading-relaxed">
+            <p className="font-bold mb-2 text-gray-800 uppercase tracking-tighter">Instructions de dépannage :</p>
+            <ul className="list-disc ml-4 space-y-2">
+              <li>Le message <b>"Invalid API key"</b> indique que la clé dans <code className="bg-gray-100 px-1">lib/supabase.ts</code> n'est pas reconnue par votre projet Supabase.</li>
+              <li>Vérifiez que vous avez bien copié la <b>anon public key</b> et non la service_role key.</li>
+              <li>Assurez-vous que l'URL <b>{supabase.auth.getSession ? "ryagsmqnmdpmtphkenjy" : ""}</b> correspond bien à votre projet actuel.</li>
             </ul>
           </div>
           <button 
             onClick={() => { setLoading(true); setErrorMsg(null); fetchBookings(); }}
-            className="bg-red-600 text-white px-8 py-3 rounded-2xl font-bold shadow-lg shadow-red-200 transition-transform active:scale-95"
+            className="bg-gray-900 text-white px-10 py-4 rounded-2xl font-bold shadow-xl transition-all active:scale-95"
           >
             Réessayer la connexion
           </button>
@@ -129,10 +126,10 @@ const App: React.FC = () => {
               <section className="relative h-64 md:h-96 rounded-3xl overflow-hidden shadow-2xl">
                 <img 
                   src="https://images.unsplash.com/photo-1543731068-7e0f5beff43a?auto=format&fit=crop&q=80&w=1200" 
-                  alt="Zaitunay Bay Beirut" 
+                  alt="Beirut Padel" 
                   className="w-full h-full object-cover brightness-75"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col items-center justify-center text-white p-6 text-center">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col items-center justify-center text-white p-6 text-center">
                   <div className="mb-4 flex items-center gap-3">
                      <span className="text-4xl">🇱🇧</span>
                      <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase">The Padelist</h1>
@@ -169,14 +166,14 @@ const App: React.FC = () => {
                 <div className="bg-white rounded-3xl p-12 text-center shadow-sm border border-gray-100">
                   <div className="text-5xl mb-4">🎾</div>
                   <h3 className="text-xl font-semibold text-gray-700">Aucune session enregistrée</h3>
-                  <button onClick={() => setView('home')} className="mt-6 bg-green-600 text-white px-8 py-3 rounded-2xl font-bold shadow-lg shadow-green-100">Réserver maintenant</button>
+                  <button onClick={() => setView('home')} className="mt-6 bg-green-600 text-white px-8 py-3 rounded-2xl font-bold">Réserver maintenant</button>
                 </div>
               ) : (
                 <div className="space-y-4">
                   {bookings.map(booking => (
                     <div key={booking.id} className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
                       <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center text-3xl shadow-inner">👤</div>
+                        <div className="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center text-3xl">👤</div>
                         <div>
                           <h4 className="font-bold text-gray-800 text-lg">{booking.user_name || booking.userName}</h4>
                           <p className="text-gray-500 font-medium">{booking.date}</p>
@@ -190,7 +187,7 @@ const App: React.FC = () => {
                         </div>
                         <button 
                           onClick={() => handleCancelBooking(booking.id)} 
-                          className="bg-red-50 text-red-500 hover:bg-red-100 px-4 py-2 rounded-xl text-sm font-bold transition-colors"
+                          className="text-red-500 hover:text-red-700 font-bold text-sm px-4 py-2"
                         >
                           Annuler
                         </button>
