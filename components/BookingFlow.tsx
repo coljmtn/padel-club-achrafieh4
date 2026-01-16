@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { Court, Booking } from '../types';
 
@@ -31,13 +32,33 @@ const PACKAGES_CONFIG: Package[] = [
     targetDay: 4
   },
   {
-    id: 'saturday-morning-8p',
-    name: 'Match Coaching Samedi',
+    id: 'saturday-c1-coach',
+    name: 'Coaching Court N°1 (1h30)',
     dayName: 'Samedi',
-    timeRange: '10:30 - 12:00',
-    maxPlayers: 8,
-    description: 'Session avec tournoi interne et conseils tactiques.',
-    pricePerPerson: 12,
+    timeRange: '10:00 - 11:30',
+    maxPlayers: 4,
+    description: 'Session intensive avec coach sur le Court Panoramique.',
+    pricePerPerson: 11.5,
+    targetDay: 6
+  },
+  {
+    id: 'saturday-c2-slot1',
+    name: 'Session Court N°2 (Créneau 1)',
+    dayName: 'Samedi',
+    timeRange: '10:00 - 11:00',
+    maxPlayers: 4,
+    description: 'Session de jeu sur le Court N°2.',
+    pricePerPerson: 7.5,
+    targetDay: 6
+  },
+  {
+    id: 'saturday-c2-slot2',
+    name: 'Session Court N°2 (Créneau 2)',
+    dayName: 'Samedi',
+    timeRange: '11:00 - 12:00',
+    maxPlayers: 4,
+    description: 'Session de jeu sur le Court N°2.',
+    pricePerPerson: 7.5,
     targetDay: 6
   }
 ];
@@ -57,16 +78,14 @@ export const BookingFlow: React.FC<BookingFlowProps> = ({ court, bookings, onClo
       let daysUntil = (pkg.targetDay - currentDay + 7) % 7;
       
       // LOGIQUE DE CLÔTURE DYNAMIQUE
-      // Si la session est AUJOURD'HUI et qu'il est plus de 12h
-      // OU si c'est pour Samedi et qu'on est déjà Vendredi après 12h
       let forceNextWeek = false;
       
       if (pkg.targetDay === 6) { // Cas du Samedi
-        // Si on est Vendredi après 12h (daysUntil=1) ou Samedi (daysUntil=0)
-        if ((currentDay === 5 && currentHour >= 12) || (currentDay === 6)) {
+        // Clôture le Jeudi soir (on fixe à 20h le jeudi pour "Jeudi soir")
+        if ((currentDay === 4 && currentHour >= 20) || currentDay === 5 || currentDay === 6) {
           forceNextWeek = true;
         }
-      } else if (daysUntil === 0 && currentHour >= 12) { // Autres jours
+      } else if (daysUntil === 0 && currentHour >= 12) { // Autres jours (Jeudi)
         forceNextWeek = true;
       }
 
@@ -87,9 +106,9 @@ export const BookingFlow: React.FC<BookingFlowProps> = ({ court, bookings, onClo
     });
   }, []);
 
-  const getRemainingSpots = (dateStr: string, max: number) => {
-    // On compare avec les bookings existants en base
-    const taken = bookings.filter(b => b.date === dateStr).length;
+  const getRemainingSpots = (dateStr: string, timeStr: string, max: number) => {
+    // On compare avec les bookings existants en base sur la date ET l'heure
+    const taken = bookings.filter(b => b.date === dateStr && b.time === timeStr).length;
     return Math.max(0, max - taken);
   };
 
@@ -125,16 +144,16 @@ export const BookingFlow: React.FC<BookingFlowProps> = ({ court, bookings, onClo
         <div className="p-8 overflow-y-auto max-h-[70vh]">
           {step === 1 ? (
             <div className="space-y-6">
-              <div className="bg-green-50 border-2 border-green-100 p-4 rounded-2xl flex items-center gap-4">
-                <span className="text-2xl">📅</span>
-                <p className="text-xs text-green-800 font-black uppercase leading-tight">
-                  Les réservations pour le samedi ferment chaque vendredi à midi. Les sessions affichées sont les prochaines disponibles.
+              <div className="bg-orange-50 border-2 border-orange-100 p-4 rounded-2xl flex items-center gap-4">
+                <span className="text-2xl">🚨</span>
+                <p className="text-xs text-orange-800 font-black uppercase leading-tight">
+                  Attention : Les réservations pour le samedi ferment chaque jeudi soir. Les sessions affichées sont les prochaines disponibles.
                 </p>
               </div>
 
               <div className="space-y-4">
                 {sessions.map((pkg) => {
-                  const spots = getRemainingSpots(pkg.dateDisplay, pkg.maxPlayers);
+                  const spots = getRemainingSpots(pkg.dateDisplay, pkg.timeRange, pkg.maxPlayers);
                   const isFull = spots <= 0;
                   const isSelected = selectedPackage?.id === pkg.id && selectedPackage?.dateDisplay === pkg.dateDisplay;
                   
@@ -153,7 +172,7 @@ export const BookingFlow: React.FC<BookingFlowProps> = ({ court, bookings, onClo
                     >
                       <div className="flex-1">
                         <p className={`text-[10px] font-black uppercase mb-1 ${isSelected ? 'text-green-600' : 'text-gray-400'}`}>
-                          {pkg.dateDisplay}
+                          {pkg.dateDisplay} • {pkg.timeRange}
                         </p>
                         <h4 className="text-lg font-bold text-gray-800 group-hover:text-green-600 transition-colors">{pkg.name}</h4>
                         <p className="text-xs text-gray-400 mt-2 font-medium">{pkg.description}</p>

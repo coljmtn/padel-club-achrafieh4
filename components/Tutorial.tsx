@@ -41,7 +41,7 @@ export const Tutorial: React.FC<TutorialProps> = ({ onBack }) => {
           <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100">
             <h3 className="text-xl font-bold mb-4">Transcription du Guide</h3>
             <p className="text-gray-600 leading-relaxed italic">
-              "Bienvenue sur PadelPlus ! Pour réserver, commencez par choisir un terrain. Sélectionnez votre session : Jeudi pour un cours technique, ou Samedi pour un match coaché. Notez que pour le samedi, les réservations basculent sur la semaine suivante après vendredi midi. Entrez votre nom et votre WhatsApp, confirmez, et retrouvez votre reçu dans l'onglet 'Réservations'. À bientôt sur le court !"
+              "Bienvenue sur PadelPlus ! Pour réserver, commencez par choisir un terrain. Sélectionnez votre session : Jeudi pour un cours technique, ou Samedi pour nos nouveaux créneaux (Coaching sur le Court N°1 ou session classique sur le Court N°2). Notez que pour le samedi, les réservations basculent sur la semaine suivante dès le jeudi soir. Entrez votre nom et votre WhatsApp, confirmez, et retrouvez votre reçu dans l'onglet 'Réservations'. À bientôt sur le court !"
             </p>
           </div>
         </div>
@@ -61,8 +61,8 @@ export const Tutorial: React.FC<TutorialProps> = ({ onBack }) => {
           <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-start gap-4">
             <div className="w-10 h-10 bg-green-50 text-green-600 rounded-xl flex items-center justify-center font-black shrink-0">2</div>
             <div>
-              <p className="font-bold text-gray-800">Session & Date</p>
-              <p className="text-xs text-gray-500">Le planning est dynamique et hebdomadaire.</p>
+              <p className="font-bold text-gray-800">Session & Court</p>
+              <p className="text-xs text-gray-500">Choisissez entre le Court N°1 (Coaching) ou le Court N°2.</p>
             </div>
           </div>
 
@@ -83,9 +83,9 @@ export const Tutorial: React.FC<TutorialProps> = ({ onBack }) => {
           </div>
           
           <div className="mt-8 bg-gray-900 p-8 rounded-3xl text-white">
-            <p className="text-xs font-black uppercase tracking-widest text-green-400 mb-2">Règle d'or ⚠️</p>
+            <p className="text-xs font-black uppercase tracking-widest text-orange-400 mb-2">Règle d'or ⚠️</p>
             <p className="text-sm leading-relaxed">
-              Pour les Match Coaching du samedi, toute inscription après <strong>Vendredi 12h00</strong> est automatiquement reportée au samedi de la semaine suivante.
+              Pour les sessions du samedi, toute inscription après le <strong>Jeudi soir (20h00)</strong> est automatiquement reportée au samedi de la semaine suivante.
             </p>
           </div>
         </div>
