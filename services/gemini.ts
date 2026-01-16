@@ -1,0 +1,1 @@
+// Fichier supprimé car l'IA n'est plus requise
