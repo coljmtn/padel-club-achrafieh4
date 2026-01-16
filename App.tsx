@@ -1,7 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import { Layout } from './components/Layout';
 import { CourtCard } from './components/CourtCard';
 import { BookingFlow } from './components/BookingFlow';
+import { Tutorial } from './components/Tutorial';
 import { Court, CourtType, Booking } from './types';
 import { supabase } from './lib/supabase';
 
@@ -20,7 +22,7 @@ const COURTS: Court[] = [
 const App: React.FC = () => {
   const [selectedCourt, setSelectedCourt] = useState<Court | null>(null);
   const [bookings, setBookings] = useState<Booking[]>([]);
-  const [view, setView] = useState<'home' | 'my-bookings' | 'admin'>('home');
+  const [view, setView] = useState<'home' | 'my-bookings' | 'admin' | 'tutorial'>('home');
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -30,15 +32,11 @@ const App: React.FC = () => {
         .from('bookings')
         .select('*');
 
-      if (error) {
-        throw error; // Sera rattrapé par le catch
-      }
+      if (error) throw error;
       
       setBookings(data || []);
       setErrorMsg(null);
     } catch (err: any) {
-      console.error("Erreur détectée:", err);
-      // On s'assure que le message d'erreur est lisible même si c'est un objet
       const message = err.message || (typeof err === 'object' ? JSON.stringify(err) : String(err));
       setErrorMsg(message);
     } finally {
@@ -101,16 +99,8 @@ const App: React.FC = () => {
         <div className="bg-red-50 border border-red-100 p-8 rounded-3xl text-center max-w-xl mx-auto animate-fadeIn">
           <div className="text-4xl mb-4">🚫</div>
           <h2 className="text-xl font-bold text-red-800 mb-2">Erreur de Clé API</h2>
-          <div className="text-red-600 mb-6 font-mono text-sm bg-white p-6 rounded-2xl border border-red-100 shadow-inner overflow-x-auto">
+          <div className="text-red-600 mb-6 font-mono text-sm bg-white p-6 rounded-2xl border border-red-100 shadow-inner">
             {errorMsg}
-          </div>
-          <div className="text-left bg-white p-5 rounded-2xl text-xs text-gray-600 mb-6 border border-gray-100 leading-relaxed">
-            <p className="font-bold mb-2 text-gray-800 uppercase tracking-tighter">Instructions de dépannage :</p>
-            <ul className="list-disc ml-4 space-y-2">
-              <li>Le message <b>"Invalid API key"</b> indique que la clé dans <code className="bg-gray-100 px-1">lib/supabase.ts</code> n'est pas reconnue par votre projet Supabase.</li>
-              <li>Vérifiez que vous avez bien copié la <b>anon public key</b> et non la service_role key.</li>
-              <li>Assurez-vous que l'URL <b>{supabase.auth.getSession ? "ryagsmqnmdpmtphkenjy" : ""}</b> correspond bien à votre projet actuel.</li>
-            </ul>
           </div>
           <button 
             onClick={() => { setLoading(true); setErrorMsg(null); fetchBookings(); }}
@@ -135,10 +125,12 @@ const App: React.FC = () => {
                      <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase">The Padelist</h1>
                   </div>
                   <p className="text-xl md:text-2xl font-light text-green-400 mb-4 tracking-[0.2em] uppercase">Achrafieh Courts</p>
-                  <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20">
-                    <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                    <span className="text-xs font-bold uppercase tracking-widest">Live Club Feed</span>
-                  </div>
+                  <button 
+                    onClick={() => setView('tutorial')}
+                    className="flex items-center gap-2 bg-white text-black px-6 py-3 rounded-full font-bold hover:bg-green-500 hover:text-white transition-all shadow-xl"
+                  >
+                    <span>▶</span> Voir le Guide Vidéo
+                  </button>
                 </div>
               </section>
 
@@ -249,6 +241,10 @@ const App: React.FC = () => {
                 </table>
               </div>
             </div>
+          )}
+
+          {view === 'tutorial' && (
+            <Tutorial onBack={() => setView('home')} />
           )}
 
           {selectedCourt && (

@@ -3,8 +3,8 @@ import React from 'react';
 
 interface LayoutProps {
   children: React.ReactNode;
-  currentView: 'home' | 'my-bookings' | 'admin';
-  setView: (view: 'home' | 'my-bookings' | 'admin') => void;
+  currentView: 'home' | 'my-bookings' | 'admin' | 'tutorial';
+  setView: (view: 'home' | 'my-bookings' | 'admin' | 'tutorial') => void;
 }
 
 export const Layout: React.FC<LayoutProps> = ({ children, currentView, setView }) => {
@@ -34,6 +34,12 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, setView }
               className={`text-sm font-semibold transition-colors ${currentView === 'home' ? 'text-green-600' : 'text-gray-500 hover:text-gray-800'}`}
             >
               Terrains
+            </button>
+            <button 
+              onClick={() => setView('tutorial')}
+              className={`text-sm font-semibold transition-colors ${currentView === 'tutorial' ? 'text-green-600' : 'text-gray-500 hover:text-gray-800'}`}
+            >
+              Guide
             </button>
             <button 
               onClick={() => setView('my-bookings')}
