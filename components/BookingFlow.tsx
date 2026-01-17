@@ -53,12 +53,12 @@ const PACKAGES_CONFIG: Package[] = [
   },
   {
     id: 'saturday-c2-slot2',
-    name: 'Session Court N°2 (Créneau 2)',
+    name: 'Coaching Court N°2 (1h)',
     dayName: 'Samedi',
     timeRange: '11:00 - 12:00',
     maxPlayers: 4,
-    description: 'Session de jeu sur le Court N°2.',
-    pricePerPerson: 7.5,
+    description: 'Session avec coach sur le Court N°2.',
+    pricePerPerson: 11.5,
     targetDay: 6
   }
 ];
